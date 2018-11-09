@@ -54,7 +54,7 @@
 
         .got-items-box > .item {
             display: inline-block;
-            margin-right: 10px;
+            margin: 0 10px 10px 0;
             font-size: 18px;
             font-weight: bold;
             vertical-align: top;
@@ -125,8 +125,6 @@
             methods: {
                 goRun: function () {
 
-                    window.localStorage.setItem('enterAvailableItems', this.enterAvailableItems);
-
                     this.gotItems = [];
 
                     this.availItems = this.enterAvailableItems.split(',').map(function (item) {
@@ -136,7 +134,11 @@
                     });
 
                     if (0 < this.availItems.length) {
+
                         this.mode = 'run';
+
+                        window.localStorage.setItem('enterAvailableItems', this.availItems.join(','));
+
                     } else {
                         this.$alert('请输入可选项！', {type: 'error'});
                     }
