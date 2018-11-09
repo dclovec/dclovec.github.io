@@ -135,7 +135,11 @@
                         return !!item;
                     });
 
-                    this.mode = 'run';
+                    if (0 < this.availItems.length) {
+                        this.mode = 'run';
+                    } else {
+                        this.$alert('请输入可选项！', {type: 'error'});
+                    }
 
                 },
                 goConfig: function () {
