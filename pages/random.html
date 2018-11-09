@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>乐透中奖</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.4.9/theme-chalk/index.css"/>
+    <style>
+        .available-items-inputer {
+            display: block;
+            width: 600px;
+            margin: 100px auto 50px;
+        }
+
+        .available-items-inputer > .el-textarea__inner {
+            height: 300px;
+        }
+
+        .btn {
+            width: 100px;
+        }
+
+        .start-btn {
+            float: right;
+            margin-right: calc(50% - 300px);
+        }
+
+        .current-got-item {
+            width: 600px;
+            height: 300px;
+            margin: 20px auto;
+            font-size: 97px;
+            text-align: center;
+            line-height: 260px;
+            box-sizing: border-box;
+        }
+
+        .current-got-item.empty {
+            font-size: 40px;
+        }
+
+        .get-btn {
+            margin-left: calc(50% - 300px);
+        }
+
+        .got-items-box {
+            list-style-type: none;
+            padding: 20px 0 0;
+            margin: 50px calc(50% - 300px) 0;
+            border-top: 1px solid #eee;
+            font-size: 0;
+        }
+
+        .got-items-box > .item {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            vertical-align: top;
+            text-align: center;
+        }
+
+        .got-items-box > .item.odd .el-card__body {
+            background-color: #eee;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="app">
+    <template v-if="'config'===mode">
+        <el-input v-model="enterAvailableItems"
+                  type="textarea"
+                  class="available-items-inputer"
+                  placeholder="项之间以英文逗号为分隔符">
+        </el-input>
+        <el-button class="start-btn" @click="goRun">确定</el-button>
+    </template>
+    <template v-else-if="'run'===mode">
+        <el-card shadow="always"
+                 class="current-got-item"
+                 :class="0<gotItems.length && !setEmpty ? '' : 'empty'">
+            {{ 0 < gotItems.length ? (setEmpty ? '' : currentGotItem) : '点击下面按钮抽取'}}
+        </el-card>
+
+        <template v-if="0<availItems.length">
+            <el-button class="get-btn" @click="getNext">随机抽取</el-button>
+            <el-button class="get-btn" @click="getAll">全部抽取</el-button>
+        </template>
+        <el-button v-else disabled class="get-btn finished">已抽取完</el-button>
+        <el-button class="get-btn" @click="goConfig">重新设置</el-button>
+
+        <ul class="got-items-box">
+            <li v-for="(item, index) of gotItems" :key="index" class="item" :class="(0===index%2)?'odd':''">
+                <el-card shadow="hover">{{item}}</el-card>
+            </li>
+        </ul>
+    </template>
+</div>
+
+<script src="https://cdn.bootcss.com/vue/2.5.17/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.4.9/index.js"></script>
+
+<script>
+    ;(function (window) {
+
+        var Vue = window.Vue;
+
+        new Vue({
+            el: '#app',
+            data: {
+                mode: 'config',
+                enterAvailableItems: '',
+                availItems: [],
+                gotItems: [],
+                setEmpty: false
+            },
+            computed: {
+                currentGotItem: function () {
+                    return this.gotItems[this.gotItems.length - 1];
+                }
+            },
+            methods: {
+                goRun: function () {
+
+                    window.localStorage.setItem('enterAvailableItems', this.enterAvailableItems);
+
+                    this.gotItems = [];
+
+                    this.availItems = this.enterAvailableItems.split(',').map(function (item) {
+                        return item.trim();
+                    }).filter(function (item) {
+                        return !!item;
+                    });
+
+                    this.mode = 'run';
+
+                },
+                goConfig: function () {
+
+                    this.gotItems = [];
+
+                    this.mode = 'config';
+
+                },
+                getNext: function () {
+
+                    var $this = this;
+
+                    $this.setEmpty = true;
+
+                    window.setTimeout(function () {
+
+                        var nextIndex = ~~(Math.random() * $this.availItems.length);
+                        var gotItem = $this.availItems.splice(nextIndex, 1)[0];
+                        $this.gotItems.push(gotItem);
+
+                        $this.setEmpty = false;
+
+                    }, 100);
+
+                },
+                getAll: function () {
+
+                    var result = [];
+                    var availItems = this.availItems;
+
+                    while (0 < availItems.length) {
+                        var nextIndex = ~~(Math.random() * availItems.length);
+                        var gotItem = availItems.splice(nextIndex, 1)[0];
+                        result.push(gotItem);
+                    }
+
+                    this.gotItems.push.apply(this.gotItems, result);
+
+                }
+            },
+            created: function () {
+                this.enterAvailableItems = window.localStorage.getItem('enterAvailableItems') || '';
+            }
+        });
+
+
+    })(window);
+</script>
+
+</body>
+
+</html>
