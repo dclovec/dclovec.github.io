@@ -1,0 +1,101 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>任务一</title>
+    <style>
+        body {
+            padding-top: 50px;
+            text-align: center;
+        }
+
+        .question::before {
+            content: "题目：";
+        }
+
+        .answer-input::before {
+            content: "答案：";
+        }
+
+        .check-answer-btn {
+            vertical-align: middle;
+        }
+
+        .answerIsOK {
+            display: none;
+        }
+
+        .answerIsOK.right {
+            display: block;
+            color: #5d5;
+        }
+
+        .answerIsOK.fault {
+            display: block;
+            color: #e55;
+        }
+    </style>
+</head>
+
+<body>
+    <p class="question"></p>
+    <div class="answer-input">
+        <input type="number" class="answer" placeholder="输入答案" />
+        <button class="check-answer-btn">检查答案是否正确</button>
+    </div>
+    <h3 class="answerIsOK"></h3>
+    <script src="Question.js"></script>
+    <script>
+        ; (function (window) {
+            var document = window.document;
+            var questionEl = document.querySelector('.question');
+            var answerIsOK = document.querySelector('.answerIsOK');
+            var answerInput = document.querySelector('.answer');
+            var checkAnswerBtn = document.querySelector('.check-answer-btn');
+
+            answerInput.addEventListener('focus', function () {
+                answerIsOK.className = 'answerIsOK';
+            });
+
+            var checkTimes = 0;
+            checkAnswerBtn.addEventListener('click', function () {
+                if (3 === checkTimes) {
+                    return;
+                }
+
+                checkTimes++;
+                if (!!question) {
+                    if (answerInput.value === question.get().answer.toString()) {
+                        answerIsOK.innerHTML = '太棒啦，回答正确！';
+                        answerIsOK.className = 'answerIsOK right';
+                        checkAnswerBtn.style.display = 'none';
+                        answerInput.setAttribute('disabled', 'disabled');
+                    } else {
+                        answerIsOK.className = 'answerIsOK fault';
+                        if (3 > checkTimes) {
+                            answerIsOK.innerHTML = '喔噢，答错了，你还有' + (3 - checkTimes) + '次机会！';
+                        } else {
+                            answerIsOK.innerHTML = '您已答错3次，请下次继续努力！';
+                            checkAnswerBtn.style.display = 'none';
+                            answerInput.setAttribute('disabled', 'disabled');
+                        }
+                    }
+                }
+            });
+
+            var question;
+            function start() {
+                if (!question) {
+                    question = new window.Question();
+                }
+                var data = question.regenerate().get();
+                questionEl.innerHTML = data.question;
+            }
+            start();
+        })(window);
+    </script>
+</body>
+
+</html>
