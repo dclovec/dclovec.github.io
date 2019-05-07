@@ -15,6 +15,10 @@
             content: "题目：";
         }
 
+        .question::after {
+            content: " （结果保留2位小数）";
+        }
+
         .answer-input::before {
             content: "答案：";
         }
@@ -36,16 +40,25 @@
             display: block;
             color: #e55;
         }
+
+        .restart-btn {
+            display: none;
+        }
+
+        .show {
+            display: unset !important;
+        }
     </style>
 </head>
 
 <body>
     <p class="question"></p>
     <div class="answer-input">
-        <input type="number" class="answer" placeholder="输入答案" />
+        <input type="number" autofocus class="answer" placeholder="输入答案" />
         <button class="check-answer-btn">检查答案是否正确</button>
     </div>
     <h3 class="answerIsOK"></h3>
+    <button class="restart-btn">再做一题</button>
     <script src="Question.js"></script>
     <script>
         ; (function (window) {
@@ -54,22 +67,44 @@
             var answerIsOK = document.querySelector('.answerIsOK');
             var answerInput = document.querySelector('.answer');
             var checkAnswerBtn = document.querySelector('.check-answer-btn');
+            var restartBtn = document.querySelector('.restart-btn');
+
+            restartBtn.addEventListener('click', function () {
+                start();
+                answerIsOK.className = 'answerIsOK';
+                checkAnswerBtn.style.display = '';
+                answerInput.removeAttribute('disabled');
+                answerInput.value = '';
+                restartBtn.className = 'restart-btn';
+                answerInput.focus();
+            });
 
             answerInput.addEventListener('focus', function () {
                 answerIsOK.className = 'answerIsOK';
+                restartBtn.className = 'restart-btn';
             });
 
-            checkAnswerBtn.addEventListener('click', function () {
+            function checkAnswer() {
                 if (!!question) {
-                    if (answerInput.value === question.get().answer.toString()) {
+                    if (
+                        !!answerInput.value.trim() &&
+                        parseFloat(answerInput.value).toFixed(2) === question.get().answer.toFixed(2)
+                    ) {
                         answerIsOK.innerHTML = '太棒啦，回答正确！';
                         answerIsOK.className = 'answerIsOK right';
                         checkAnswerBtn.style.display = 'none';
                         answerInput.setAttribute('disabled', 'disabled');
+                        restartBtn.className = 'restart-btn show';
                     } else {
                         answerIsOK.innerHTML = '喔噢，答错了，再试试吧！';
                         answerIsOK.className = 'answerIsOK fault';
                     }
+                }
+            }
+            checkAnswerBtn.addEventListener('click', checkAnswer);
+            answerInput.addEventListener('keyup', function (e) {
+                if (e.keyCode === 13) {
+                    checkAnswer();
                 }
             });
 
