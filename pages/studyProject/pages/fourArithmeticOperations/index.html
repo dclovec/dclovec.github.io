@@ -19,6 +19,16 @@
             border-right: 1px solid #ccc;
         }
 
+        .menu-list a {
+            text-decoration: none;
+        }
+
+        .menu-list .active>a {
+            padding: 0 10px;
+            background-color: #50b3b4;
+            transition: all 0.4s ease-in;
+        }
+
         .content {
             display: inline-block;
             width: calc(100% - 161px);
@@ -48,8 +58,14 @@
     <iframe src="about:blank" frameborder="0" class="content"></iframe>
     <script>
         var contentIframe = document.querySelector('.content');
+        var prevActive = null;
         function go(el) {
             contentIframe.src = el.getAttribute('data-href');
+            if (!!prevActive) {
+                prevActive.parentElement.className = '';
+            }
+            el.parentElement.className = 'active';
+            prevActive = el;
         }
     </script>
 </body>
