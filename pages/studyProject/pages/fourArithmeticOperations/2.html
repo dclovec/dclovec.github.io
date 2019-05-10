@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>任务一</title>
+    <title>任务二</title>
     <style>
         body {
             padding-top: 50px;
@@ -87,6 +87,13 @@
 
             var checkTimes = 0;
             function checkAnswer() {
+                var answer = answerInput.value;
+
+                if (!answer) {
+                    alert('请先输入答案！');
+                    return;
+                }
+
                 if (3 === checkTimes) {
                     return;
                 }
@@ -94,8 +101,8 @@
                 checkTimes++;
                 if (!!question) {
                     if (
-                        !!answerInput.value.trim() &&
-                        parseFloat(answerInput.value).toFixed(2) === question.get().answer.toFixed(2)
+                        parseFloat(answer).toFixed(2) ===
+                        question.get().answer.toFixed(2)
                     ) {
                         answerIsOK.innerHTML = '太棒啦，回答正确！';
                         answerIsOK.className = 'answerIsOK right';
@@ -128,6 +135,7 @@
                     question = new window.Question();
                 }
                 var data = question.regenerate().get();
+                data.answer = +data.answer.toFixed(2);
                 questionEl.innerHTML = data.question;
             }
             start();

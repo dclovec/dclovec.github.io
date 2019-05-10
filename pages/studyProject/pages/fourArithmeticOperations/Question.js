@@ -67,11 +67,12 @@ window.Question = function (operator) {
         }
         return data;
     };
-    this.regenerate = function (operator) {
-        data = generate(operator || randomOperator());
+    this.regenerate = function (newOperator) {
+        data = generate(newOperator || operator || randomOperator());
         return this;
     };
 
 };
+window.Question.ALL_OPERATORS = ALL_OPERATORS;
 
 // })(window);

@@ -5,29 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>四则运算</title>
+    <style>
+        body {
+            font-size: 0;
+            margin: 0;
+        }
+
+        .menu-list {
+            display: inline-block;
+            width: 120px;
+            padding-left: 40px;
+            font-size: 16px;
+            border-right: 1px solid #ccc;
+        }
+
+        .content {
+            display: inline-block;
+            width: calc(100% - 161px);
+            font-size: 16px;
+        }
+    </style>
 </head>
 
 <body>
-    <ol>
+    <ol class="menu-list">
         <li>
-            <a href="1.html">任务一</a>
+            <a href="javascript:;" data-href="1.html" onclick="go(this)">任务一</a>
         </li>
         <li>
-            <a href="2.html">任务二</a>
+            <a href="javascript:;" data-href="2.html" onclick="go(this)">任务二</a>
         </li>
         <li>
-            <a href="3.html">任务三</a>
+            <a href="javascript:;" data-href="3.html" onclick="go(this)">任务三</a>
         </li>
         <li>
-            <a href="4.html">任务四</a>
+            <a href="javascript:;" data-href="4.html" onclick="go(this)">任务四</a>
         </li>
         <li>
-            <a href="5.html">任务五</a>
-        </li>
-        <li>
-            <a href="6.html">任务六</a>
+            <a href="javascript:;" data-href="5.html" onclick="go(this)">任务五</a>
         </li>
     </ol>
+    <iframe src="about:blank" frameborder="0" class="content"></iframe>
+    <script>
+        var contentIframe = document.querySelector('.content');
+        function go(el) {
+            contentIframe.src = el.getAttribute('data-href');
+        }
+    </script>
 </body>
 
 </html>

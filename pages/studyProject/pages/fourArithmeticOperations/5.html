@@ -1,0 +1,209 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>任务三</title>
+    <style>
+        body {
+            padding-top: 50px;
+            text-align: center;
+        }
+
+        /* 
+        .question::before {
+            content: "题目：";
+        } */
+
+        .question::after {
+            content: " （结果保留2位小数）";
+        }
+
+        /* 
+        .answer-input::before {
+            content: "答案：";
+        } */
+
+        .next-btn {
+            vertical-align: middle;
+        }
+
+        .answerIsOK {
+            display: none;
+        }
+
+        .answerIsOK.right {
+            display: block;
+            color: #5d5;
+        }
+
+        .answerIsOK.fault {
+            display: block;
+            color: #e55;
+        }
+
+        .restart-btn {
+            display: none;
+        }
+
+        .result.right {
+            color: #5d5;
+        }
+
+        .result.fault {
+            color: #e55;
+        }
+
+        .redo-btn {
+            display: none;
+            font-size: 20px;
+        }
+
+        .show {
+            display: unset !important;
+        }
+    </style>
+</head>
+
+<body>
+    <p class="question"></p>
+    <div class="answer-input">
+        <input type="number" class="answer" placeholder="输入答案" />
+        <button class="next-btn">下一题</button>
+    </div>
+
+    <button class="redo-btn"></button>
+    <p class="result-box"></p>
+    <script src="Question.js"></script>
+    <script>
+        // ; (function (window) {
+        var document = window.document;
+        var questionEl = document.querySelector('.question');
+        var answerInput = document.querySelector('.answer');
+        var nextBtn = document.querySelector('.next-btn');
+        var resultBox = document.querySelector('.result-box');
+        var redoBtn = document.querySelector('.redo-btn');
+
+        var redoCountdownTime = 10 * 60;
+        var redoTime = redoCountdownTime;
+        var redoCtx = null;
+        function startRedoCountdown() {
+            redoTime--;
+            if (-1 < redoTime) {
+                var minute = ~~(redoTime / 60);
+                var second = redoTime % 60;
+                var res = [];
+                if (minute > 0) {
+                    res.push(minute.toString() + '分钟');
+                    if (second > 0) {
+                        res.push(second.toString() + '秒');
+                    }
+                } else {
+                    res.push(second.toString() + '秒');
+                }
+                redoBtn.innerHTML = res.join('') + '后重新开始做题';
+                redoCtx = window.setTimeout(startRedoCountdown, 1000);
+            } else {
+                window.clearTimeout(redoCtx);
+                redoCtx = null;
+                if (confirm('确认开始重新做题吗？')) {
+                    redo();
+                }
+            }
+        }
+        function redo() {
+            window.clearTimeout(redoCtx);
+            redoCtx = null;
+
+            redoBtn.className = 'redo-btn';
+
+            all = [];
+            redoTime = redoCountdownTime;
+
+            start();
+
+            answerInput.style.display = 'unset';
+            nextBtn.style.display = 'unset';
+            questionEl.style.display = 'unset';
+            resultBox.innerHTML = '';
+        }
+        redoBtn.addEventListener('click', redo);
+
+        function checkAnswer() {
+            var answer = answerInput.value;
+
+            if (!answer) {
+                alert('请先输入答案！');
+                return;
+            }
+
+            all[all.length - 1].input = answer;
+            answerInput.value = '';
+            if (10 > all.length) {
+                start();
+            } else {
+                answerInput.style.display = 'none';
+                nextBtn.style.display = 'none';
+                questionEl.style.display = 'none';
+                finish();
+            }
+        }
+        nextBtn.addEventListener('click', checkAnswer);
+        answerInput.addEventListener('keyup', function (e) {
+            if (e.keyCode === 13) {
+                checkAnswer();
+            }
+        });
+
+        var all = [];
+        var question;
+        function start() {
+            if (!question) {
+                question = new window.Question();
+            }
+
+            var data = question.regenerate().get();
+            all.push(data);
+
+            data.answer = +data.answer.toFixed(2);
+            questionEl.innerHTML = data.question = all.length.toString() + '、' + data.question;
+
+            if (10 === all.length) {
+                nextBtn.innerHTML = '检查答案';
+            }
+        }
+
+        function isInputOK(question) {
+            return !!question.input.trim() &&
+                parseFloat(question.input.trim()).toFixed(2) === question.answer.toFixed(2);
+        }
+        var rightCountKeyName = 'right-count-task-3';
+        function finish() {
+            var rightCount = all.filter(item => isInputOK(item)).length;
+
+            var prevRight = window.localStorage.getItem(rightCountKeyName);
+            window.localStorage.setItem(rightCountKeyName, rightCount.toString());
+
+            var result = all.map(item => `
+                <p>${item.question}</p>
+                <p>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;你的答案：${item.input} （<span class="result ${isInputOK(item) ? 'right">✔' : 'fault">✘'}</span>）&emsp;&emsp;&emsp;&emsp;正确答案：${item.answer}</p>
+                `);
+
+            resultBox.innerHTML = `<h3>您的得分：${10 * rightCount}
+                    ${null !== prevRight ? `&emsp;&emsp;&emsp;&emsp;上次做对${prevRight}道题` : ''}
+                    &emsp;&emsp;&emsp;&emsp;本次做对${rightCount}道题</h3>` +
+                result.join('');
+
+            if (7.5 > rightCount) {
+                redoBtn.className = 'redo-btn show';
+                startRedoCountdown();
+            }
+        }
+
+        start();
+        // })(window);
+    </script>
+</body>
+
+</html>
